@@ -8,13 +8,18 @@ API_URL = "https://inference-api.nousresearch.com/v1/chat/completions"
 API_KEY = "sk-ZhUb5k6PN6cCoSZb-jyueQ"
 
 # --- Sayfa Yapılandırması ---
-st.set_page_config(page_title="ChatBot UI", layout="centered")
+st.set_page_config(page_title="EfePro AI Chat Bot", layout="centered")
 
 # --- Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "selected_model" not in st.session_state:
+    st.session_state.selected_model = "Hermes-3-Llama-3.1-70B"
 
-# --- HTML, CSS (Header sabitleme, sola hizalama, stil ayarları) ---
+# --- Başlık ---
+st.markdown("<h1 style='text-align: center; color: white;'>Nous AI Chat Bot</h1>", unsafe_allow_html=True)
+
+# --- CSS ---
 st.markdown("""
     <style>
         .stApp {
@@ -22,91 +27,24 @@ st.markdown("""
             color: white;
             font-family: 'Segoe UI', sans-serif;
         }
-        header.fixed {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background-color: #111;
-            padding: 10px 20px;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .model-box {
-            color: white;
-        }
-        .controls button {
-            background: #444;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin: 0 5px;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
         .message-container {
-            padding-top: 80px;
+            padding-bottom: 100px;
             max-width: 800px;
             margin: auto;
         }
         .element-container:has(.stChatMessage) {
             text-align: left !important;
         }
+        .chat-footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #111;
+            padding: 10px 20px;
+            z-index: 1000;
+        }
     </style>
-    <header class="fixed">
-        <div class="model-box">
-            <label>Model seçiniz:</label>
-        </div>
-        <div class="controls">
-            <button onclick="player.previousVideo()">⏮</button>
-            <button onclick="togglePlay()">▶️/⏸️</button>
-            <button onclick="toggleMute()">🔇</button>
-            <button onclick="player.nextVideo()">⏭</button>
-        </div>
-    </header>
-    <iframe id="player" width="0" height="0" style="display:none;" src="https://www.youtube.com/embed/videoseries?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI&autoplay=1&loop=1&mute=0&enablejsapi=1" frameborder="0" allow="autoplay"></iframe>
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script>
-        var player;
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                events: {
-                    'onReady': onPlayerReady
-                }
-            });
-        }
-        function onPlayerReady(event) {
-            event.target.setVolume(100);
-            event.target.playVideo();
-        }
-        function togglePlay() {
-            var state = player.getPlayerState();
-            if (state === YT.PlayerState.PLAYING) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
-            }
-        }
-        function toggleMute() {
-            if (player.isMuted()) {
-                player.unMute();
-            } else {
-                player.mute();
-            }
-        }
-    </script>
 """, unsafe_allow_html=True)
-
-# --- Model Seçimi ---
-model = st.selectbox("", [
-    "Hermes-3-Llama-3.1-70B",
-    "DeepHermes-3-Llama-3-8B-Preview",
-    "DeepHermes-3-Mistral-24B-Preview",
-    "Hermes-3-Llama-3.1-405B"
-], label_visibility="collapsed")
 
 # --- Mevcut Mesajları Göster ---
 st.markdown('<div class="message-container">', unsafe_allow_html=True)
@@ -131,7 +69,7 @@ if user_input:
                 "Content-Type": "application/json"
             }
             data = {
-                "model": model,
+                "model": st.session_state.selected_model,
                 "messages": st.session_state.messages[-5:],
                 "temperature": 0.7
             }
@@ -147,5 +85,25 @@ if user_input:
             bot_time = datetime.now().strftime("%H:%M")
             st.session_state.messages.append({"role": "assistant", "content": bot_reply, "time": bot_time})
             st.markdown(f"{bot_reply} <span style='font-size: small; color: gray;'>({bot_time})</span>", unsafe_allow_html=True)
+
+# --- Model Seçici Chat Input Altına ---
+with st.container():
+    st.session_state.selected_model = st.selectbox(
+        "Model Seçiniz:",
+        [
+            "Hermes-3-Llama-3.1-70B",
+            "DeepHermes-3-Llama-3-8B-Preview",
+            "DeepHermes-3-Mistral-24B-Preview",
+            "Hermes-3-Llama-3.1-405B"
+        ],
+        index=[
+            "Hermes-3-Llama-3.1-70B",
+            "DeepHermes-3-Llama-3-8B-Preview",
+            "DeepHermes-3-Mistral-24B-Preview",
+            "Hermes-3-Llama-3.1-405B"
+        ].index(st.session_state.selected_model),
+        label_visibility="collapsed",
+        key="model_selectbox"
+    )
 
 # Kod sonu
