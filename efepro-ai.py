@@ -43,7 +43,7 @@ st.markdown("""
         }
             
         .neon-title {
-            font-size: 2.5rem;
+            font-size: 1.5rem;
             position: fixed !important;
             text-align: center;
             font-weight: bold;
@@ -69,19 +69,6 @@ st.markdown("""
             padding-bottom: 200px;
             max-width: 800px;
             margin: auto;
-        }
-        .chat-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: #111;
-            padding: 10px 20px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            border-top: 1px solid #333;
         }
         .stChatMessage {
             background-color: #222;
