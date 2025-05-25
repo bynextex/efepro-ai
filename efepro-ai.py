@@ -13,11 +13,12 @@ st.set_page_config(page_title="EfePro AI Chat Bot", layout="centered")
 # --- Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "persisted_messages" not in st.session_state:
+    st.session_state.persisted_messages = []
+if "logs" not in st.session_state:
+    st.session_state.logs = []
 if "selected_model" not in st.session_state:
-    st.session_state.selected_model = "Hermes-3-Llama-3.1-70B"
-
-# --- Başlık ---
-st.markdown("<h1 style='text-align: center; color: white;'>Nous AI Chat Bot</h1>", unsafe_allow_html=True)
+    st.session_state.selected_model = "Hermes-3-Llama-3.1-405B"
 
 # --- CSS ---
 st.markdown("""
@@ -27,39 +28,98 @@ st.markdown("""
             color: white;
             font-family: 'Segoe UI', sans-serif;
         }
+        label, .stSelectbox label {
+            color: white !important;
+        }
+        [class^="st-emotion-cache-"][class*="16tyu1"] {
+            color: #fff !important;
+        }
         .message-container {
-            padding-bottom: 100px;
+            padding-bottom: 200px;
             max-width: 800px;
             margin: auto;
-        }
-        .element-container:has(.stChatMessage) {
-            text-align: left !important;
         }
         .chat-footer {
             position: fixed;
             bottom: 0;
-            width: 100%;
+            left: 0;
+            right: 0;
             background-color: #111;
             padding: 10px 20px;
-            z-index: 1000;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid #333;
+        }
+        .stChatMessage {
+            background-color: #222;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            max-width: 90%;
+            word-wrap: break-word;
+            color: #fff !important;
+        }
+        .stChatMessage[data-testid="stChatMessage-assistant"] {
+            background-color: #2a2a2a;
+            border: 1px solid #FFD700;
+            box-shadow: 0 0 10px #FFD70033;
+        }
+        .stChatMessage[data-testid="stChatMessage-user"] {
+            background-color: #444;
+        }
+        @media screen and (max-width: 600px) {
+            .chat-footer {
+                padding: 8px 12px;
+            }
         }
     </style>
 """, unsafe_allow_html=True)
 
-# --- Mevcut Mesajları Göster ---
+# --- Başlık ---
+st.markdown("<h1 style='text-align: center; color: white;'>EfePro AI Chat Bot</h1>", unsafe_allow_html=True)
+
+# --- Mesajları Göster ---
 st.markdown('<div class="message-container">', unsafe_allow_html=True)
-for msg in st.session_state.messages:
+for msg in st.session_state.persisted_messages:
     with st.chat_message(msg["role"]):
-        st.markdown(f"{msg['content']} <span style='font-size: small; color: gray;'>({msg['time']})</span>", unsafe_allow_html=True)
+        st.markdown(
+            f"<span style='font-size: small; color: gray;'>({msg['time']})</span> {msg['content']}",
+            unsafe_allow_html=True
+        )
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- Kullanıcı Mesaj Girişi ---
-user_input = st.chat_input("Mesajınızı yazın...")
+# --- Chat Footer ---
+with st.markdown('<div class="chat-footer">', unsafe_allow_html=True):
+    st.session_state.selected_model = st.selectbox(
+        "Model Seçiniz:",
+        [
+            "Hermes-3-Llama-3.1-405B",
+            "Hermes-3-Llama-3.1-70B",
+            "DeepHermes-3-Llama-3-8B-Preview",
+            "DeepHermes-3-Mistral-24B-Preview"
+        ],
+        index=[
+            "Hermes-3-Llama-3.1-405B",
+            "Hermes-3-Llama-3.1-70B",
+            "DeepHermes-3-Llama-3-8B-Preview",
+            "DeepHermes-3-Mistral-24B-Preview"
+        ].index(st.session_state.selected_model),
+        key="model_selectbox"
+    )
+    user_input = st.chat_input("Mesajınızı yazın...", key="chat_input_main")
+
+# --- Mesaj Gönderme ---
 if user_input:
     timestamp = datetime.now().strftime("%H:%M")
-    st.session_state.messages.append({"role": "user", "content": user_input, "time": timestamp})
+    user_msg = {"role": "user", "content": user_input, "time": timestamp}
+    st.session_state.messages.append(user_msg)
+    st.session_state.persisted_messages.append(user_msg)
+    st.session_state.logs.append(f"[{timestamp}] USER: {user_input}")
+
     with st.chat_message("user"):
-        st.markdown(f"{user_input} <span style='font-size: small; color: gray;'>({timestamp})</span>", unsafe_allow_html=True)
+        st.markdown(f"<span style='font-size: small; color: gray;'>({timestamp})</span> {user_input}", unsafe_allow_html=True)
 
     with st.chat_message("assistant"):
         with st.spinner("Yazıyor..."):
@@ -83,27 +143,9 @@ if user_input:
                 bot_reply = f"API hatası: {str(e)}"
 
             bot_time = datetime.now().strftime("%H:%M")
-            st.session_state.messages.append({"role": "assistant", "content": bot_reply, "time": bot_time})
-            st.markdown(f"{bot_reply} <span style='font-size: small; color: gray;'>({bot_time})</span>", unsafe_allow_html=True)
+            bot_msg = {"role": "assistant", "content": bot_reply, "time": bot_time}
+            st.session_state.messages.append(bot_msg)
+            st.session_state.persisted_messages.append(bot_msg)
+            st.session_state.logs.append(f"[{bot_time}] BOT: {bot_reply}")
 
-# --- Model Seçici Chat Input Altına ---
-with st.container():
-    st.session_state.selected_model = st.selectbox(
-        "Model Seçiniz:",
-        [
-            "Hermes-3-Llama-3.1-70B",
-            "DeepHermes-3-Llama-3-8B-Preview",
-            "DeepHermes-3-Mistral-24B-Preview",
-            "Hermes-3-Llama-3.1-405B"
-        ],
-        index=[
-            "Hermes-3-Llama-3.1-70B",
-            "DeepHermes-3-Llama-3-8B-Preview",
-            "DeepHermes-3-Mistral-24B-Preview",
-            "Hermes-3-Llama-3.1-405B"
-        ].index(st.session_state.selected_model),
-        label_visibility="collapsed",
-        key="model_selectbox"
-    )
-
-# Kod sonu
+            st.markdown(f"<span style='font-size: small; color: gray;'>({bot_time})</span> {bot_reply}", unsafe_allow_html=True)
