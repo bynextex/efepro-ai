@@ -1,0 +1,42 @@
+[
+  {
+    "role": "user",
+    "content": "merhaba",
+    "time": "01:01"
+  },
+  {
+    "role": "assistant",
+    "content": "Merhaba! Nasıl yardımcı olabilirim?",
+    "time": "01:01"
+  },
+  {
+    "role": "user",
+    "content": "bugün mersinde hava durumu nasıl",
+    "time": "01:01"
+  },
+  {
+    "role": "assistant",
+    "content": "Üzgünüm, ancak şu an için anlık hava durumu bilgilerini sağlayamıyorum. Ancak, bir web tarayıcısı veya hava durumu uygulaması kullanarak Mersin'deki güncel hava durumunu kontrol edebilirsiniz.",
+    "time": "01:01"
+  },
+  {
+    "role": "user",
+    "content": "neden",
+    "time": "01:01"
+  },
+  {
+    "role": "assistant",
+    "content": "Hava durumu sürekli olarak değiştiği ve güncellendiği için, ben bir AI olduğumdan ve sürekli güncellenen verilere anlık erişim sağlayamadığımdan, size en doğru ve güncel bilgiyi sağlayamam. Bu nedenle, hava durumu konusunda en güncel bilgiye ulaşmak için bir hava durumu web sitesini veya mobil uygulamasını kullanmanızı öneririm.",
+    "time": "01:01"
+  },
+  {
+    "role": "user",
+    "content": "olsun webden bakabilirsin",
+    "time": "01:01"
+  },
+  {
+    "role": "assistant",
+    "content": "Üzgünüm, ama web'den bilgi arama ve bulma yeteneğim yok. İnternet üzerinden hava durumu bilgisine ulaşmak için bir web tarayıcısı veya hava durumu uygulaması kullanmanız gerekecek. Bu sayede en güncel ve doğru hava durumu bilgisine ulaşabilirsiniz.",
+    "time": "01:02"
+  }
+]
