@@ -7,7 +7,8 @@ import json
 
 # --- API Ayarları ---
 API_URL = "https://inference-api.nousresearch.com/v1/chat/completions"
-API_KEY = "sk-ZhUb5k6PN6cCoSZb-jyueQ"
+API_KEY = st.secrets["API_KEY"]
+
 HISTORY_FILE = "chat_history.json"
 
 # --- Sayfa Yapılandırması ---
@@ -43,7 +44,7 @@ st.markdown("""
         }
             
         .neon-title {
-            font-size: 1.5rem;
+            font-size: 2rem;
             position: fixed !important;
             text-align: center;
             font-weight: bold;
